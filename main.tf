@@ -8,7 +8,8 @@ resource "azurerm_linux_virtual_machine" "demo-vm" {
   admin_username                  = "azureuser"
 
   admin_ssh_key {
-    username = "azureuser"
+    username   = "azureuser"
+    public_key = "${tls_private_key.demo_ssh_key.public_key_openssh}"
   }
 
   boot_diagnostics {
@@ -53,7 +54,7 @@ resource "azurerm_virtual_network" "demo-vnet" {
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "demo-nsg-association" {
+resource "azurerm_network_interface_security_group_association" "demo-nsg-assc" {
   network_security_group_id = azurerm_network_security_group.demo-nsg.id
   network_interface_id      = azurerm_network_interface.demo-nic.id
 }
@@ -106,6 +107,12 @@ resource "azurerm_network_interface" "demo-nic" {
     env      = "Development"
     archUUID = "f080b5cd-0588-4c28-8733-4a1a5db959ac"
   }
+}
+
+resource "tls_private_key" "demo_ssh_key" {
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "azurerm_network_security_group" "demo-nsg" {
